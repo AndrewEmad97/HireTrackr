@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
+import { signInWithEmailAndPassword, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "firebase/auth"
 import { auth } from "../firebase"
 import Navbar from "../components/Navbar"
 
@@ -12,6 +12,14 @@ const Login = () => {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    getRedirectResult(auth).then((result) => {
+      if (result) {
+        navigate("/dashboard")
+      }
+    })
+  }, [])
 
   const handleLogin = async () => {
     setError("")
@@ -38,9 +46,8 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, provider)
-      navigate("/dashboard")
-    } catch (err) {
+      await signInWithRedirect(auth, provider)
+    } catch (err: any) {
       setError("Google sign in failed. Please try again")
     }
   }

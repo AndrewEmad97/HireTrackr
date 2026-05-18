@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { createUserWithEmailAndPassword, updateProfile, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
+import { createUserWithEmailAndPassword, updateProfile, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "firebase/auth"
 import { auth } from "../firebase"
 import Navbar from "../components/Navbar"
 
@@ -53,13 +53,19 @@ const Signup = () => {
 
  const handleGoogleSignup = async () => {
   try {
-    await signInWithPopup(auth, provider)
-    navigate("/dashboard")
+    await signInWithRedirect(auth, provider)
   } catch (err: any) {
     setError(err.message)
   }
 }
 
+useEffect(() => {
+  getRedirectResult(auth).then((result) => {
+    if (result) {
+      navigate("/dashboard")
+    }
+  })
+}, [])
   return (
     <div className="min-h-screen w-full">
       <Navbar />
