@@ -78,26 +78,20 @@ const Home = () => {
       </section>
 
       {/* footer */}
-      <footer className="border-t border-white/10 mt-16">
-        <div className="w-full px-4 md:px-12 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<footer className="border-t border-white/10 mt-16">
+  <div className="w-full px-4 md:px-12 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
 
-          <div className="flex items-center gap-2">
-            <img src="/logo.svg" alt="HireTrackr logo" className="w-7 h-7" />
-            <span className="text-sm font-bold text-white tracking-tight">
-              Hire<span className="text-blue-400 font-light">Trackr</span>
-            </span>
-          </div>
+    <div className="flex items-center gap-2">
+      <img src="/logo.svg" alt="HireTrackr logo" className="w-7 h-7" />
+      <span className="text-sm font-bold text-white tracking-tight">
+        Hire<span className="text-blue-400 font-light">Trackr</span>
+      </span>
+    </div>
 
-          <div className="flex gap-6">
-            <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">About</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">Privacy</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-gray-300 transition-colors">Terms</a>
-          </div>
+    <p className="text-sm text-gray-600">© 2026 HireTrackr. All rights reserved.</p>
 
-          <p className="text-sm text-gray-600">© 2026 HireTrackr. All rights reserved.</p>
-
-        </div>
-      </footer>
+  </div>
+</footer>
 
     </div>
   )
