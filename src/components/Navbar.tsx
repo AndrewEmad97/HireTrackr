@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react"
 import { onAuthStateChanged } from "firebase/auth"
 import type { User } from "firebase/auth"
 
-
 type NavbarProps = {
   isLoggedIn?: boolean
 }
@@ -16,7 +15,6 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u)
@@ -24,7 +22,6 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
     return () => unsubscribe()
   }, [])
 
-  // close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -40,7 +37,6 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
     navigate("/")
   }
 
-  // get initials from email or display name
   const getInitials = () => {
     if (user?.displayName) {
       return user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
@@ -54,8 +50,8 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
   }
 
   return (
-    <nav className="w-full border-b border-white/10 py-5 bg-[#0b1020]">
-      <div className="w-full px-12 flex justify-between items-center">
+    <nav className="w-full border-b border-white/10 py-4 md:py-5 bg-[#0b1020]">
+      <div className="w-full px-4 md:px-12 flex justify-between items-center">
 
         <Link to="/" className="flex items-center gap-2">
           <img src="/logo.svg" alt="HireTrackr logo" className="w-8 h-8" />
@@ -66,9 +62,6 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
 
         {isLoggedIn ? (
           <div className="flex gap-4 items-center">
-
-
-            {/* user dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -77,21 +70,18 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white text-sm font-medium flex items-center justify-center">
                   {getInitials()}
                 </div>
-                <span className="text-sm text-gray-300">{getDisplayName()}</span>
-                <span className="text-gray-500 text-xs">{dropdownOpen ? "▲" : "▼"}</span>
+                <span className="hidden md:block text-sm text-gray-300">{getDisplayName()}</span>
+                <span className="hidden md:block text-gray-500 text-xs">{dropdownOpen ? "▲" : "▼"}</span>
               </button>
 
-              {/* dropdown menu */}
               {dropdownOpen && (
                 <div className="absolute right-0 top-12 w-56 bg-[#0f1628] border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden">
 
-                  {/* user info */}
                   <div className="px-4 py-3 border-b border-white/10">
                     <p className="text-sm font-medium text-white">{getDisplayName()}</p>
                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </div>
 
-                  {/* menu items */}
                   <div className="py-1">
                     <Link
                       to="/settings"
@@ -100,7 +90,6 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
                     >
                       ⚙ Settings
                     </Link>
-
                   </div>
 
                   <div className="border-t border-white/10 py-1">

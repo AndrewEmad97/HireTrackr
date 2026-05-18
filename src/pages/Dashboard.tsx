@@ -49,7 +49,7 @@ const Dashboard = () => {
     <div className="min-h-screen w-full">
       <Navbar isLoggedIn={true} />
 
-      <div className="w-full px-12 py-10">
+      <div className="w-full px-4 md:px-12 py-6 md:py-10">
 
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -64,7 +64,7 @@ const Dashboard = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {stats.map((stat) => (
             <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl px-5 py-4">
               <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
@@ -74,7 +74,7 @@ const Dashboard = () => {
         </div>
 
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             {columns.map((status) => (
               <KanbanColumn
                 key={status}

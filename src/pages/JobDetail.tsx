@@ -14,39 +14,34 @@ const JobDetail = () => {
   const [loading, setLoading] = useState(true)
   const [showEditModal, setShowEditModal] = useState(false)
 
-
   const handleDelete = async () => {
-  if (!id) return
-  await deleteDoc(doc(db, "jobs", id))
-  navigate("/dashboard")
-}
+    if (!id) return
+    await deleteDoc(doc(db, "jobs", id))
+    navigate("/dashboard")
+  }
 
-const handleEdit = async (updatedJob: Omit<Job, "id">) => {
-  if (!id) return
-  await updateDoc(doc(db, "jobs", id), { ...updatedJob })
-  setJob((prev) => prev ? { ...prev, ...updatedJob } : prev)
-}
+  const handleEdit = async (updatedJob: Omit<Job, "id">) => {
+    if (!id) return
+    await updateDoc(doc(db, "jobs", id), { ...updatedJob })
+    setJob((prev) => prev ? { ...prev, ...updatedJob } : prev)
+  }
 
-const handleStatusChange = async (newStatus: string) => {
-  if (!id) return
-  await updateDoc(doc(db, "jobs", id), { status: newStatus })
-  setJob((prev) => prev ? { ...prev, status: newStatus as any } : prev)
-}
+  const handleStatusChange = async (newStatus: string) => {
+    if (!id) return
+    await updateDoc(doc(db, "jobs", id), { status: newStatus })
+    setJob((prev) => prev ? { ...prev, status: newStatus as any } : prev)
+  }
 
   useEffect(() => {
     const fetchJob = async () => {
       if (!id) return
-
       const docRef = doc(db, "jobs", id)
       const docSnap = await getDoc(docRef)
-
       if (docSnap.exists()) {
         setJob({ id: docSnap.id, ...docSnap.data() } as Job)
       }
-
       setLoading(false)
     }
-
     fetchJob()
   }, [id])
 
@@ -84,7 +79,7 @@ const handleStatusChange = async (newStatus: string) => {
     <div className="min-h-screen w-full">
       <Navbar isLoggedIn={true} />
 
-      <div className="w-full px-12 py-10">
+      <div className="w-full px-4 md:px-12 py-6 md:py-10">
 
         <button
           onClick={() => navigate("/dashboard")}
@@ -93,11 +88,11 @@ const handleStatusChange = async (newStatus: string) => {
           ← Back to dashboard
         </button>
 
-        <div className="flex items-start justify-between mb-10">
+        <div className="flex flex-col md:flex-row md:items-start justify-between mb-10 gap-4">
           <div>
             <p className="text-sm text-gray-500 mb-1">{job.company}</p>
-            <h1 className="text-3xl font-bold text-white mb-3">{job.role}</h1>
-            <div className="flex items-center gap-3">
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-3">{job.role}</h1>
+            <div className="flex flex-wrap items-center gap-3">
               <StatusBadge status={job.status} />
               <span className="text-xs text-gray-500 border border-white/10 px-2.5 py-1 rounded-full">{job.location}</span>
               <span className="text-xs text-gray-500 border border-white/10 px-2.5 py-1 rounded-full">Applied {job.date}</span>
@@ -105,24 +100,24 @@ const handleStatusChange = async (newStatus: string) => {
           </div>
 
           <div className="flex gap-3">
-         <button
-  onClick={() => setShowEditModal(true)}
-  className="text-sm px-4 py-2 border border-white/10 rounded-lg text-gray-300 hover:text-white hover:border-white/20 transition-colors"
->
-  Edit
-</button>
-         <button
-  onClick={handleDelete}
-  className="text-sm px-4 py-2 border border-red-500/20 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
->
-  Delete
-</button>
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="text-sm px-4 py-2 border border-white/10 rounded-lg text-gray-300 hover:text-white hover:border-white/20 transition-colors"
+            >
+              Edit
+            </button>
+            <button
+              onClick={handleDelete}
+              className="text-sm px-4 py-2 border border-red-500/20 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+            >
+              Delete
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-          <div className="col-span-2 bg-white/5 border border-white/10 rounded-xl p-6">
+          <div className="md:col-span-2 bg-white/5 border border-white/10 rounded-xl p-6">
             <h2 className="text-sm font-medium text-white mb-4">Notes</h2>
             <textarea
               placeholder="Add notes about this role, interview prep, contacts..."
@@ -135,16 +130,16 @@ const handleStatusChange = async (newStatus: string) => {
 
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
               <h2 className="text-sm font-medium text-white mb-4">Status</h2>
-  <select
-  value={job.status}
-  onChange={(e) => handleStatusChange(e.target.value)}
-  className="w-full bg-[#0b1020] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
->
-  <option value="Applied" className="bg-[#0b1020]">Applied</option>
-  <option value="Interview" className="bg-[#0b1020]">Interview</option>
-  <option value="Offer" className="bg-[#0b1020]">Offer</option>
-  <option value="Rejected" className="bg-[#0b1020]">Rejected</option>
-</select>
+              <select
+                value={job.status}
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className="w-full bg-[#0b1020] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
+              >
+                <option value="Applied" className="bg-[#0b1020]">Applied</option>
+                <option value="Interview" className="bg-[#0b1020]">Interview</option>
+                <option value="Offer" className="bg-[#0b1020]">Offer</option>
+                <option value="Rejected" className="bg-[#0b1020]">Rejected</option>
+              </select>
             </div>
 
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
@@ -194,13 +189,14 @@ const handleStatusChange = async (newStatus: string) => {
           </div>
         </div>
       </div>
+
       {showEditModal && job && (
-  <EditJobModal
-    job={job}
-    onClose={() => setShowEditModal(false)}
-    onSave={handleEdit}
-  />
-)}
+        <EditJobModal
+          job={job}
+          onClose={() => setShowEditModal(false)}
+          onSave={handleEdit}
+        />
+      )}
     </div>
   )
 }
