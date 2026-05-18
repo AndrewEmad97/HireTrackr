@@ -6,6 +6,7 @@ import Login from "./pages/Login"
 import Signup from "./pages/Signup"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Settings from "./pages/Settings"
+import NotFound from "./pages/NotFound"
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <JobDetail />
           </ProtectedRoute>
         } />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )
