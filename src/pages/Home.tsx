@@ -10,10 +10,10 @@ const Home = () => {
      <section className="max-w-4xl mx-auto px-8 pt-16 pb-12 text-center">
 
 
-  <div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/20 text-blue-400 text-xs font-medium px-4 py-1.5 rounded-full mb-4">
-    <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-    Now in beta — free to use
-  </div>
+<div className="inline-flex items-center gap-2 bg-blue-600/10 border border-blue-500/20 text-blue-400 text-xs font-medium px-4 py-1.5 rounded-full mb-4">
+  <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+  Now in beta — free to use
+</div>
 
   {/* headline */}
   <h1 className="text-5xl font-bold text-white leading-tight tracking-tight mb-4">

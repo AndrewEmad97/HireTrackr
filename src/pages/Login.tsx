@@ -1,29 +1,78 @@
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
+import { auth } from "../firebase"
 import Navbar from "../components/Navbar"
-import { Link } from "react-router-dom"
+
+const provider = new GoogleAuthProvider()
 
 const Login = () => {
+  const navigate = useNavigate()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleLogin = async () => {
+    setError("")
+
+    if (!email || !password) {
+      setError("Please fill in all fields")
+      return
+    }
+
+    try {
+      setLoading(true)
+      await signInWithEmailAndPassword(auth, email, password)
+      navigate("/dashboard")
+    } catch (err: any) {
+      if (err.code === "auth/invalid-credential") {
+        setError("Invalid email or password")
+      } else {
+        setError("Something went wrong. Please try again")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, provider)
+      navigate("/dashboard")
+    } catch (err) {
+      setError("Google sign in failed. Please try again")
+    }
+  }
+
   return (
     <div className="min-h-screen w-full">
       <Navbar />
 
       <div className="flex items-center justify-center min-h-[calc(100vh-73px)]">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 w-full max-w-md mx-4">
-          
-          {/* header */}
+
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white mb-1">Welcome back</h1>
             <p className="text-sm text-gray-400">Log in to your account to continue</p>
           </div>
 
-          {/* form */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+
           <div className="flex flex-col gap-4">
-            
+
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-gray-300">Email</label>
               <input
                 type="email"
                 placeholder="you@email.com"
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
@@ -35,23 +84,30 @@ const Login = () => {
               <input
                 type="password"
                 placeholder="••••••••"
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
-            <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-lg transition-colors mt-2">
-              Log in
+            <button
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors mt-2"
+            >
+              {loading ? "Logging in..." : "Log in"}
             </button>
 
-            {/* divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 border-t border-white/10"></div>
               <span className="text-xs text-gray-500">or</span>
               <div className="flex-1 border-t border-white/10"></div>
             </div>
 
-            {/* google button */}
-            <button className="w-full flex items-center justify-center gap-3 border border-white/10 rounded-lg py-2.5 text-sm text-gray-300 hover:text-white hover:border-white/20 transition-colors">
+            <button
+              onClick={handleGoogleLogin}
+              className="w-full flex items-center justify-center gap-3 border border-white/10 rounded-lg py-2.5 text-sm text-gray-300 hover:text-white hover:border-white/20 transition-colors"
+            >
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -63,10 +119,9 @@ const Login = () => {
 
           </div>
 
-          {/* footer */}
           <p className="text-center text-sm text-gray-500 mt-6">
             Don't have an account?{" "}
-           <Link to="/signup" className="text-blue-400 hover:text-blue-300">Sign up</Link>
+            <Link to="/signup" className="text-blue-400 hover:text-blue-300">Sign up</Link>
           </p>
 
         </div>

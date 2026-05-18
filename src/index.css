@@ -14,3 +14,17 @@ body {
   color: white;
   -webkit-font-smoothing: antialiased;
 }
+
+@theme {
+  --animate-fade: fade 2s ease-in-out infinite;
+
+  @keyframes fade {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+}

@@ -1,32 +1,31 @@
 import { useState } from "react"
 import type { Job, JobStatus } from "../data"
 
-
-type AddJobModalProps = {
+type EditJobModalProps = {
+  job: Job
   onClose: () => void
-  onAdd: (job: Omit<Job, "id">) => void
+  onSave: (updatedJob: Omit<Job, "id">) => void
 }
 
-const AddJobModal = ({ onClose, onAdd }: AddJobModalProps) => {
-  const [company, setCompany] = useState("")
-  const [role, setRole] = useState("")
-  const [status, setStatus] = useState<JobStatus>("Applied")
-  const [location, setLocation] = useState("")
+const EditJobModal = ({ job, onClose, onSave }: EditJobModalProps) => {
+  const [company, setCompany] = useState(job.company)
+  const [role, setRole] = useState(job.role)
+  const [status, setStatus] = useState<JobStatus>(job.status)
+  const [location, setLocation] = useState(job.location)
 
-const handleSubmit = () => {
-  if (!company || !role) return
+  const handleSave = () => {
+    if (!company || !role) return
 
-  const newJob: Omit<Job, "id"> = {
-    company,
-    role,
-    status,
-    location,
-    date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    onSave({
+      company,
+      role,
+      status,
+      location,
+      date: job.date,
+    })
+
+    onClose()
   }
-
-  onAdd(newJob)
-  onClose()
-}
 
   return (
     <>
@@ -42,7 +41,7 @@ const handleSubmit = () => {
 
           {/* header */}
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-white">Add new job</h2>
+            <h2 className="text-lg font-bold text-white">Edit job</h2>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-white transition-colors text-xl"
@@ -58,7 +57,6 @@ const handleSubmit = () => {
               <label className="text-sm text-gray-300">Company</label>
               <input
                 type="text"
-                placeholder="e.g. Vercel"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
@@ -69,7 +67,6 @@ const handleSubmit = () => {
               <label className="text-sm text-gray-300">Role</label>
               <input
                 type="text"
-                placeholder="e.g. Frontend Developer"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
@@ -80,7 +77,6 @@ const handleSubmit = () => {
               <label className="text-sm text-gray-300">Location</label>
               <input
                 type="text"
-                placeholder="e.g. Remote"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
@@ -112,10 +108,10 @@ const handleSubmit = () => {
               Cancel
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={handleSave}
               className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm text-white font-medium transition-colors"
             >
-              Add job
+              Save changes
             </button>
           </div>
 
@@ -125,4 +121,4 @@ const handleSubmit = () => {
   )
 }
 
-export default AddJobModal
+export default EditJobModal

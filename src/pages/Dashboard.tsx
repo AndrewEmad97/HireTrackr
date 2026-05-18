@@ -1,16 +1,16 @@
-import { useState } from "react"
 import { DndContext, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import type { DragEndEvent } from "@dnd-kit/core"
 import Navbar from "../components/Navbar"
 import KanbanColumn from "../components/KanbanColumn"
 import AddJobModal from "../components/AddJobModal"
-import { mockJobs } from "../data"
-import type { Job, JobStatus } from "../data"
+import { useState } from "react"
+import type { JobStatus } from "../data"
+import { useJobs } from "../hooks/useJobs"
 
 const columns: JobStatus[] = ["Applied", "Interview", "Offer", "Rejected"]
 
 const Dashboard = () => {
-  const [jobs, setJobs] = useState<Job[]>(mockJobs)
+  const { jobs, loading, addJob, updateJobStatus } = useJobs()
   const [showModal, setShowModal] = useState(false)
 
   const sensors = useSensors(
@@ -19,20 +19,12 @@ const Dashboard = () => {
     })
   )
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
     if (!over) return
     const jobId = active.id as string
     const newStatus = over.id as JobStatus
-    setJobs((prev) =>
-      prev.map((job) =>
-        job.id === jobId ? { ...job, status: newStatus } : job
-      )
-    )
-  }
-
-  const handleAddJob = (job: Job) => {
-    setJobs((prev) => [...prev, job])
+    await updateJobStatus(jobId, newStatus)
   }
 
   const stats = [
@@ -42,13 +34,23 @@ const Dashboard = () => {
     { label: "Rejected", value: jobs.filter((j) => j.status === "Rejected").length },
   ]
 
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full">
+        <Navbar isLoggedIn={true} />
+        <div className="flex items-center justify-center min-h-[calc(100vh-73px)]">
+          <p className="text-gray-400 text-sm">Loading your jobs...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen w-full">
       <Navbar isLoggedIn={true} />
 
       <div className="w-full px-12 py-10">
 
-        {/* page title + add button */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl font-bold text-white mb-1">My applications</h1>
@@ -62,7 +64,6 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* stat cards */}
         <div className="grid grid-cols-4 gap-4 mb-10">
           {stats.map((stat) => (
             <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl px-5 py-4">
@@ -72,7 +73,6 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* kanban board */}
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <div className="grid grid-cols-4 gap-4">
             {columns.map((status) => (
@@ -87,11 +87,10 @@ const Dashboard = () => {
 
       </div>
 
-      {/* modal */}
       {showModal && (
         <AddJobModal
           onClose={() => setShowModal(false)}
-          onAdd={handleAddJob}
+          onAdd={addJob}
         />
       )}
 

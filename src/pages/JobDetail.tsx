@@ -1,14 +1,66 @@
+import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { db } from "../firebase"
+import { doc, getDoc, deleteDoc, updateDoc } from "firebase/firestore"
 import Navbar from "../components/Navbar"
 import StatusBadge from "../components/StatusBadge"
-import { mockJobs } from "../data"
+import type { Job } from "../data"
+import EditJobModal from "../components/EditJobModal"
 
 const JobDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const job = mockJobs.find((j) => j.id === id)
+  const [job, setJob] = useState<Job | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [showEditModal, setShowEditModal] = useState(false)
 
-  // job not found
+
+  const handleDelete = async () => {
+  if (!id) return
+  await deleteDoc(doc(db, "jobs", id))
+  navigate("/dashboard")
+}
+
+const handleEdit = async (updatedJob: Omit<Job, "id">) => {
+  if (!id) return
+  await updateDoc(doc(db, "jobs", id), { ...updatedJob })
+  setJob((prev) => prev ? { ...prev, ...updatedJob } : prev)
+}
+
+const handleStatusChange = async (newStatus: string) => {
+  if (!id) return
+  await updateDoc(doc(db, "jobs", id), { status: newStatus })
+  setJob((prev) => prev ? { ...prev, status: newStatus as any } : prev)
+}
+
+  useEffect(() => {
+    const fetchJob = async () => {
+      if (!id) return
+
+      const docRef = doc(db, "jobs", id)
+      const docSnap = await getDoc(docRef)
+
+      if (docSnap.exists()) {
+        setJob({ id: docSnap.id, ...docSnap.data() } as Job)
+      }
+
+      setLoading(false)
+    }
+
+    fetchJob()
+  }, [id])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full">
+        <Navbar isLoggedIn={true} />
+        <div className="flex items-center justify-center min-h-[calc(100vh-73px)]">
+          <p className="text-gray-400 text-sm">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   if (!job) {
     return (
       <div className="min-h-screen w-full">
@@ -34,7 +86,6 @@ const JobDetail = () => {
 
       <div className="w-full px-12 py-10">
 
-        {/* back button */}
         <button
           onClick={() => navigate("/dashboard")}
           className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors mb-8"
@@ -42,7 +93,6 @@ const JobDetail = () => {
           ← Back to dashboard
         </button>
 
-        {/* header */}
         <div className="flex items-start justify-between mb-10">
           <div>
             <p className="text-sm text-gray-500 mb-1">{job.company}</p>
@@ -55,19 +105,23 @@ const JobDetail = () => {
           </div>
 
           <div className="flex gap-3">
-            <button className="text-sm px-4 py-2 border border-white/10 rounded-lg text-gray-300 hover:text-white hover:border-white/20 transition-colors">
-              Edit
-            </button>
-            <button className="text-sm px-4 py-2 border border-red-500/20 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors">
-              Delete
-            </button>
+         <button
+  onClick={() => setShowEditModal(true)}
+  className="text-sm px-4 py-2 border border-white/10 rounded-lg text-gray-300 hover:text-white hover:border-white/20 transition-colors"
+>
+  Edit
+</button>
+         <button
+  onClick={handleDelete}
+  className="text-sm px-4 py-2 border border-red-500/20 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+>
+  Delete
+</button>
           </div>
         </div>
 
-        {/* body */}
         <div className="grid grid-cols-3 gap-6">
 
-          {/* notes - takes 2 cols */}
           <div className="col-span-2 bg-white/5 border border-white/10 rounded-xl p-6">
             <h2 className="text-sm font-medium text-white mb-4">Notes</h2>
             <textarea
@@ -77,27 +131,25 @@ const JobDetail = () => {
             />
           </div>
 
-          {/* sidebar */}
           <div className="flex flex-col gap-4">
 
-            {/* status */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
               <h2 className="text-sm font-medium text-white mb-4">Status</h2>
-              <select
-  defaultValue={job.status}
-  className="w-full bg-[#0b1020] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors cursor-pointer"
+  <select
+  value={job.status}
+  onChange={(e) => handleStatusChange(e.target.value)}
+  className="w-full bg-[#0b1020] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors"
 >
-  <option value="Applied" className="bg-[#0b1020] text-white">Applied</option>
-  <option value="Interview" className="bg-[#0b1020] text-white">Interview</option>
-  <option value="Offer" className="bg-[#0b1020] text-white">Offer</option>
-  <option value="Rejected" className="bg-[#0b1020] text-white">Rejected</option>
+  <option value="Applied" className="bg-[#0b1020]">Applied</option>
+  <option value="Interview" className="bg-[#0b1020]">Interview</option>
+  <option value="Offer" className="bg-[#0b1020]">Offer</option>
+  <option value="Rejected" className="bg-[#0b1020]">Rejected</option>
 </select>
             </div>
 
-            {/* timeline */}
             <div className="bg-white/5 border border-white/10 rounded-xl p-6">
               <h2 className="text-sm font-medium text-white mb-4">Timeline</h2>
-              
+
               <div className="flex flex-col gap-4">
                 <div className="flex gap-3">
                   <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
@@ -136,13 +188,19 @@ const JobDetail = () => {
                     </div>
                   </div>
                 )}
-
               </div>
             </div>
 
           </div>
         </div>
       </div>
+      {showEditModal && job && (
+  <EditJobModal
+    job={job}
+    onClose={() => setShowEditModal(false)}
+    onSave={handleEdit}
+  />
+)}
     </div>
   )
 }

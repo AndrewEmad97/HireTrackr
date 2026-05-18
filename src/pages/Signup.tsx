@@ -1,7 +1,54 @@
-import { Link } from "react-router-dom"
+import { useState } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
+import { auth } from "../firebase"
 import Navbar from "../components/Navbar"
 
 const Signup = () => {
+  const navigate = useNavigate()
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleSignup = async () => {
+    setError("")
+
+    if (!name || !email || !password) {
+      setError("Please fill in all fields")
+      return
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters")
+      return
+    }
+
+    try {
+  setLoading(true)
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+  await updateProfile(userCredential.user, {
+    displayName: name,
+  })
+  navigate("/dashboard")
+} catch (err: any) {
+  if (err.code === "auth/email-already-in-use") {
+    setError("An account with this email already exists")
+  } else {
+    setError("Something went wrong. Please try again")
+  }
+} finally {
+  setLoading(false)
+}
+  }
+
   return (
     <div className="min-h-screen w-full">
       <Navbar />
@@ -9,21 +56,28 @@ const Signup = () => {
       <div className="flex items-center justify-center min-h-[calc(100vh-73px)]">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 w-full max-w-md mx-4">
 
-          {/* header */}
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-white mb-1">Create an account</h1>
             <p className="text-sm text-gray-400">Start tracking your job search for free</p>
           </div>
 
-          {/* form */}
+          {/* error message */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+
           <div className="flex flex-col gap-4">
 
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-gray-300">Full name</label>
               <input
                 type="text"
-                placeholder="Name"
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
@@ -32,7 +86,9 @@ const Signup = () => {
               <input
                 type="email"
                 placeholder="you@email.com"
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
@@ -41,7 +97,9 @@ const Signup = () => {
               <input
                 type="password"
                 placeholder="••••••••"
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
@@ -50,22 +108,26 @@ const Signup = () => {
               <input
                 type="password"
                 placeholder="••••••••"
-                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
-            <button className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 rounded-lg transition-colors mt-2">
-              Create account
+            <button
+              onClick={handleSignup}
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors mt-2"
+            >
+              {loading ? "Creating account..." : "Create account"}
             </button>
 
-            {/* divider */}
             <div className="flex items-center gap-3">
               <div className="flex-1 border-t border-white/10"></div>
               <span className="text-xs text-gray-500">or</span>
               <div className="flex-1 border-t border-white/10"></div>
             </div>
 
-            {/* google button */}
             <button className="w-full flex items-center justify-center gap-3 border border-white/10 rounded-lg py-2.5 text-sm text-gray-300 hover:text-white hover:border-white/20 transition-colors">
               <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -78,7 +140,6 @@ const Signup = () => {
 
           </div>
 
-          {/* footer */}
           <p className="text-center text-sm text-gray-500 mt-6">
             Already have an account?{" "}
             <Link to="/login" className="text-blue-400 hover:text-blue-300">Log in</Link>
