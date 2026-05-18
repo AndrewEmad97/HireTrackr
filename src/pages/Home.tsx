@@ -1,6 +1,8 @@
 import Navbar from "../components/Navbar";
+import { useNavigate } from "react-router-dom"
 
 const Home = () => {
+  const navigate = useNavigate()
   return (
    <div className="min-h-screen w-full ">
       <Navbar />
@@ -26,19 +28,22 @@ const Home = () => {
 
   {/* CTA buttons */}
   <div className="flex gap-4 justify-center mb-12">
-    <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 transition-colors">
-      Get started free
-    </button>
-    <button className="px-6 py-3 border border-white/20 text-gray-300 rounded-lg hover:text-white hover:border-white/40 transition-colors">
-      See how it works
-    </button>
+   {/* Get started button */}
+<button
+  onClick={() => navigate("/signup")}
+  className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 transition-colors"
+>
+  Get started free
+</button>
+
+
   </div>
 
   {/* divider */}
   <div className="border-t border-white/10 mb-12"></div>
 
   {/* features */}
-  <div className="grid grid-cols-3 gap-6 text-left">
+  <div id="features" className="grid grid-cols-3 gap-6 text-left">
 
     <div className="bg-white/5 border border-white/10 rounded-xl p-6">
       <div className="w-10 h-10 bg-blue-600/20 rounded-lg flex items-center justify-center mb-4 text-blue-400 text-xl">
@@ -74,8 +79,8 @@ const Home = () => {
 
 </section>
 {/* footer */}
-<footer className="border-t border-white/10 mt-16">
-  <div className="w-full px-12 py-8 flex justify-between items-center">
+<footer className="border-t border-white/10 ">
+  <div className="w-full px-12 py-6 flex justify-between items-center">
     
     {/* logo */}
     <div className="flex items-center gap-2">
