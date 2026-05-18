@@ -51,12 +51,12 @@ const Signup = () => {
 }
   }
 
-  const handleGoogleSignup = async () => {
+ const handleGoogleSignup = async () => {
   try {
     await signInWithPopup(auth, provider)
     navigate("/dashboard")
-  } catch (err) {
-    setError("Google sign in failed. Please try again")
+  } catch (err: any) {
+    setError(err.message)
   }
 }
 
